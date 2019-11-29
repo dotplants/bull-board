@@ -27,7 +27,7 @@ export default function App({ basePath }) {
               <Queue
                 queue={queue}
                 key={queue.name}
-                selectedStatus={selectedStatuses[queue.name]}
+                selectedStatus={selectedStatuses[queue.name] || 'latest'}
                 selectStatus={setSelectedStatuses}
                 retryJob={retryJob(queue.name)}
                 retryAll={retryAll(queue.name)}

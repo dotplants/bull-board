@@ -1,27 +1,35 @@
-module.exports = async function retryJob(req, res) {
+module.exports = async function retryJob(ctx) {
   try {
-    const { queues } = req.app.locals
-    const { queueName, id } = req.params
+    const {
+      queues,
+      params: { queueName, id },
+    } = ctx
 
     const queue = queues[queueName]
 
     if (!queue) {
-      return res.status(404).send({ error: 'queue not found' })
+      ctx.status = 404
+      ctx.body = { error: 'queue not found' }
+      return
     }
 
     const job = await queue.getJob(id)
 
     if (!job) {
-      return res.status(404).send({ error: 'job not found' })
+      ctx.status = 404
+      ctx.body = { error: 'job not found' }
+      return
     }
 
     await job.retry()
-    return res.sendStatus(204)
+    ctx.status = 204
+    return
   } catch (e) {
-    const body = {
+    ctx.body = {
       error: 'queue error',
       details: e.stack,
     }
-    return res.status(500).send(body)
+    ctx.status = 500
+    return
   }
 }

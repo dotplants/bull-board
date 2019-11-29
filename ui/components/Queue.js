@@ -222,7 +222,11 @@ const fieldComponents = {
 
 function Jobs({ retryJob, queue: { jobs, name }, status }) {
   if (!jobs.length) {
-    return `No jobs with status ${status}`
+    return (
+      <div className="content">
+        <b>✨No jobs with status {status}</b>
+      </div>
+    )
   }
 
   return (
@@ -270,7 +274,7 @@ function QueueActions(props) {
       return null
     })
   return (
-    <div>
+    <div className="queue">
       <Actions {...props} />
     </div>
   )

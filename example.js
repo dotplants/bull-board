@@ -1,5 +1,9 @@
-const { createQueues, setQueues, UI } = require('./')
-const app = require('express')()
+const { setQueues, UI } = require('./')
+const Queue = require('bull')
+const cluster = require('cluster')
+const Koa = require('koa')
+const Router = require('koa-router')
+const bodyParser = require('koa-bodyparser')
 
 const sleep = t => new Promise(resolve => setTimeout(resolve, t * 1000))
 
@@ -12,15 +16,43 @@ const redisOptions = {
   },
 }
 
+const workers = 10
+const example = new Queue('example', redisOptions)
+
 const run = () => {
-  setQueues([/* Already defined (bull) queues */]);
-  // Or a single bull queue
-  setQueues(/* Already defined bull queue */);
+  const app = new Koa()
+  const router = new Router()
 
-  const queues = createQueues(redisOptions)
+  router.all('/add', ctx => {
+    for (let i = 0; i < 20; i++) {
+      example.add({ title: ctx.query.title })
+    }
+    ctx.body = { ok: true }
+  })
 
-  const example = queues.add('example')
+  setQueues(example)
+  const ui = UI(app)
+  router.use('/ui', ui.routes(), ui.allowedMethods())
 
+  app.use(bodyParser())
+  app.use(router.routes())
+  app.use(router.allowedMethods())
+  app.listen(3000)
+
+  console.log('Running on 3000...')
+  console.log('For the UI, open http://localhost:3000/ui')
+  console.log('Make sure Redis is running on port 6379 by default')
+  console.log('To populate the queue, run:')
+  console.log('  curl http://localhost:3000/add?title=Example')
+}
+
+if (cluster.isMaster) {
+  for (let i = 0; i < workers; i++) {
+    cluster.fork()
+  }
+
+  run()
+} else {
   example.process(async job => {
     for (let i = 0; i <= 100; i++) {
       await sleep(Math.random())
@@ -28,20 +60,4 @@ const run = () => {
       if (Math.random() * 200 < 1) throw new Error(`Random error ${i}`)
     }
   })
-
-  app.use('/add', (req, res) => {
-    example.add({ title: req.query.title })
-    res.json({ ok: true })
-  })
-
-  app.use('/ui', UI)
-  app.listen(3000, () => {
-    console.log('Running on 3000...')
-    console.log('For the UI, open http://localhost:3000/ui')
-    console.log('Make sure Redis is running on port 6379 by default')
-    console.log('To populate the queue, run:')
-    console.log('  curl http://localhost:3000/add?title=Example')
-  })
 }
-
-run()

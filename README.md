@@ -1,3 +1,7 @@
+# Customized bull-board for Koa
+
+---
+
 # bull-board 🎯
 
 Bull Dashboard is a UI built on top of [Bull](https://github.com/OptimalBits/bull) to help you visualize your queues and their jobs.
@@ -37,10 +41,10 @@ npm i bull-board
 When you already defined your queue(s) you can add them using the `setQueues` function.
 
 ```js
-const Queue = require('bull');
+const Queue = require('bull')
 
-const someQueue = new Queue();
-const someOtherQueue = new Queue();
+const someQueue = new Queue()
+const someOtherQueue = new Queue()
 
 const { setQueues } = require('bull-board')
 
@@ -48,10 +52,7 @@ setQueues(someQueue)
 
 // OR
 
-setQueues([
-    someQueue,
-    someOtherQueue
-])
+setQueues([someQueue, someOtherQueue])
 ```
 
 ### Configure Queue(s) using bull-board

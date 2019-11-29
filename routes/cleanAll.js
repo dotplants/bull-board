@@ -1,23 +1,27 @@
-module.exports = async function handler(req, res) {
+module.exports = async function handler(ctx) {
   try {
-    const { queueName } = req.params
-    const { queues } = req.app.locals
+    const {
+      queues,
+      params: { queueName },
+    } = ctx
 
     const GRACE_TIME_MS = 5000
 
     const queue = queues[queueName]
     if (!queue) {
-      return res.status(404).send({ error: 'queue not found' })
+      ctx.status = 404
+      ctx.body = { error: 'queue not found' }
+      return
     }
 
     await queue.clean(GRACE_TIME_MS, 'delayed')
 
-    return res.sendStatus(200)
+    ctx.status = 200
   } catch (e) {
-    const body = {
+    ctx.body = {
       error: 'queue error',
       details: e.stack,
     }
-    return res.status(500).send(body)
+    ctx.status = 500
   }
 }
