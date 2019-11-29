@@ -14,15 +14,12 @@ function UI(app) {
   router.put('/queues/:queueName/retry', require('./routes/retryAll'))
   router.put('/queues/:queueName/:id/retry', require('./routes/retryJob'))
   router.put('/queues/:queueName/clean', require('./routes/cleanAll'))
-  router.get('/', require('./routes/index'))
+  router.get('/dashboard', require('./routes/index'))
   router.get('/static/*', ctx =>
-    serve(ctx, ctx.path.slice(11), {
+    serve(ctx, ctx.path.split('/static')[1], {
       root: path.resolve(__dirname, 'static'),
     }),
   )
-  router.use('*', ctx => {
-    console.log(ctx.path)
-  })
 
   return router
 }
