@@ -22,6 +22,7 @@ async function getStats(queue) {
 const formatJob = job => {
   return {
     id: job.id,
+    name: job.name,
     timestamp: job.timestamp,
     processedOn: job.processedOn,
     finishedOn: job.finishedOn,

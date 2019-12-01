@@ -54,13 +54,29 @@ const statuses = [
 ]
 
 const fields = {
-  latest: ['id', 'timestamps', 'progress', 'attempts', 'data', 'opts'],
-  completed: ['id', 'timestamps', 'progress', 'attempts', 'data', 'opts'],
-  delayed: ['id', 'timestamps', 'attempts', 'delay', 'data', 'opts'],
-  paused: ['id', 'timestamps', 'attempts', 'data', 'opts'],
-  active: ['id', 'timestamps', 'progress', 'attempts', 'data', 'opts'],
-  waiting: ['id', 'timestamps', 'data', 'opts'],
-  failed: ['id', 'failedReason', 'timestamps', 'progress', 'attempts', 'retry'],
+  latest: ['id', 'name', 'timestamps', 'progress', 'attempts', 'data', 'opts'],
+  completed: [
+    'id',
+    'name',
+    'timestamps',
+    'progress',
+    'attempts',
+    'data',
+    'opts',
+  ],
+  delayed: ['id', 'name', 'timestamps', 'attempts', 'delay', 'data', 'opts'],
+  paused: ['id', 'name', 'timestamps', 'attempts', 'data', 'opts'],
+  active: ['id', 'name', 'timestamps', 'progress', 'attempts', 'data', 'opts'],
+  waiting: ['id', 'name', 'timestamps', 'data', 'opts'],
+  failed: [
+    'id',
+    'name',
+    'failedReason',
+    'timestamps',
+    'progress',
+    'attempts',
+    'retry',
+  ],
 }
 
 function PlusIcon({ width = 18 }) {
@@ -134,6 +150,9 @@ function CheckIcon({ width = 18 }) {
 const fieldComponents = {
   id: ({ job }) => {
     return <b>#{job.id}</b>
+  },
+  name: ({ job: { name } }) => {
+    return <b>{name === '__default__' ? '(default)' : name}</b>
   },
   timestamps: ({ job }) => {
     return (
